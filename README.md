@@ -1,6 +1,6 @@
 # Lottie Website Tester
 
-A free, single-file website tester that finds broken links, slow pages, and bloated pages on your site — no signup, no paywall, no install.
+A free, single-file website tester that finds broken links, slow pages, and bloated pages on your site — no signup, no paywall, no subscription nagging, no install.
 
 [Download `lottie-website-tester.html`](./lottie-website-tester.html), upload it anywhere on your domain, and open it in your browser. That's the whole install.
 
