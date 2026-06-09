@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lottie Website Tester</title>
+<style>
+:root {
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --panel-2: #fafbfd;
+  --border: #e3e6ec;
+  --text: #1f2330;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --err: #dc2626;
+  --redirect: #7c3aed;
+  --code-bg: #f1f3f7;
+  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1116;
+    --panel: #181b22;
+    --panel-2: #1d2129;
+    --border: #2a2f3a;
+    --text: #e6e8ee;
+    --muted: #9aa3b2;
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --redirect: #c084fc;
+    --code-bg: #11141a;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3);
+  }
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.5;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  background: var(--panel); position: sticky; top: 0; z-index: 50;
+  box-shadow: var(--shadow);
+}
+header h1 { margin: 0; font-size: 18px; letter-spacing: -0.01em; }
+header h1 .v { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+header .title-block { display: flex; flex-direction: column; gap: 2px; }
+header .tagline { font-size: 12px; color: var(--muted); line-height: 1.35; }
+header .tagline code { font-size: 11px; padding: 1px 4px; }
+header nav { display: flex; gap: 8px; }
+header nav a { color: var(--accent); text-decoration: none; padding: 6px 10px; border-radius: 6px; font-weight: 500; }
+header nav a:hover { background: var(--panel-2); }
+.panel {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; margin: 12px 0; box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 12px 0; font-size: 15px; font-weight: 600; }
+.panel h3 { margin: 12px 0 6px 0; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.banner { padding: 12px 16px; border-radius: 10px; margin: 12px 0; border: 1px solid; }
+.banner.warn { background: rgba(217,119,6,0.08); border-color: var(--warn); color: var(--text); }
+.banner.err { background: rgba(220,38,38,0.08); border-color: var(--err); color: var(--text); }
+.banner.info { background: rgba(37,99,235,0.08); border-color: var(--accent); color: var(--text); }
+.banner strong { display: block; margin-bottom: 4px; }
+.banner a { color: var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+label { display: block; font-weight: 500; margin-bottom: 4px; font-size: 12px; color: var(--muted); }
+input[type=text], input[type=url], input[type=number], textarea, select {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border); background: var(--panel-2);
+  color: var(--text); border-radius: 6px; font-size: 13px; font-family: inherit;
+}
+textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; min-height: 60px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.checkbox-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.checkbox-row input { width: auto; }
+.checkbox-row label { margin: 0; color: var(--text); font-weight: 400; font-size: 13px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+button {
+  padding: 8px 14px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+  border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit;
+  transition: background 0.1s, border-color 0.1s;
+}
+button:hover:not(:disabled) { background: var(--panel); border-color: var(--accent); }
+button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+button.danger { color: var(--err); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.progress-bar { background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; height: 18px; overflow: hidden; position: relative; }
+.progress-bar > .fill { background: var(--accent); height: 100%; width: 0%; transition: width 0.2s; }
+.progress-bar > .label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 12px; }
+.stat { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+.stat .n { font-size: 18px; font-weight: 600; }
+.stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+.stat.ok .n { color: var(--ok); }
+.stat.warn .n { color: var(--warn); }
+.stat.err .n { color: var(--err); }
+.stat.redirect .n { color: var(--redirect); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.tab-group { display: inline-flex; align-items: center; gap: 2px; }
+.tabs button { background: transparent; border: none; padding: 8px 12px; border-bottom: 2px solid transparent; border-radius: 0; color: var(--muted); margin-bottom: -1px; }
+.tabs button.active { color: var(--text); border-bottom-color: var(--accent); }
+.tabs button:hover:not(:disabled) { background: var(--panel-2); border-color: transparent; border-bottom-color: var(--accent); color: var(--text); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.toolbar input[type=text] { width: auto; flex: 1; min-width: 180px; }
+.chip { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; user-select: none; }
+.chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); background: var(--panel-2); cursor: pointer; user-select: none; position: sticky; top: 56px; z-index: 1; }
+th .arrow { color: var(--muted); margin-left: 4px; }
+td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:hover { background: var(--panel-2); }
+.url-cell { word-break: break-all; max-width: 480px; }
+.url-cell a { color: var(--accent); text-decoration: none; }
+.url-cell a:hover { text-decoration: underline; }
+.status-pill { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; min-width: 30px; text-align: center; }
+.status-pill.ok { background: rgba(22,163,74,0.12); color: var(--ok); }
+.status-pill.redirect { background: rgba(124,58,237,0.12); color: var(--redirect); }
+.status-pill.warn { background: rgba(217,119,6,0.12); color: var(--warn); }
+.status-pill.err { background: rgba(220,38,38,0.12); color: var(--err); }
+.status-pill.opaque { background: var(--code-bg); color: var(--muted); }
+.notes { color: var(--muted); font-size: 11px; }
+.notes .note-tag { display: inline-block; margin-right: 4px; padding: 1px 5px; border-radius: 3px; background: var(--code-bg); }
+.scroll-x { overflow-x: auto; }
+.empty { padding: 24px; text-align: center; color: var(--muted); }
+code, kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--code-bg); padding: 2px 5px; border-radius: 4px; font-size: 12px; }
+pre { background: var(--code-bg); padding: 10px 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+pre code { background: transparent; padding: 0; }
+details { margin: 6px 0; }
+details > summary { cursor: pointer; padding: 6px 0; font-weight: 500; }
+.muted { color: var(--muted); }
+.help-section h3 { color: var(--text); text-transform: none; letter-spacing: 0; font-size: 14px; }
+.help-section h4 { margin: 12px 0 4px 0; font-size: 13px; }
+.help-section ul { margin: 6px 0; padding-left: 22px; }
+.help-section li { margin: 2px 0; }
+.group-page { margin: 10px 0; padding: 8px 10px; background: var(--panel-2); border-radius: 6px; border: 1px solid var(--border); }
+.group-page .group-head { font-weight: 600; word-break: break-all; margin-bottom: 4px; }
+.group-page table { margin-top: 4px; }
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.kbd-shortcut { font-size: 11px; color: var(--muted); margin-left: 4px; }
+footer { padding: 20px 16px; color: var(--muted); font-size: 12px; text-align: center; }
+.copy-btn { padding: 2px 6px; font-size: 11px; margin-left: 6px; }
+.help-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--muted); color: var(--panel);
+  font-size: 10px; font-weight: 700; line-height: 1;
+  border: none; padding: 0; margin-left: 5px;
+  cursor: pointer; vertical-align: middle;
+  font-family: inherit; transition: background 0.12s;
+}
+.help-icon:hover, .help-icon:focus-visible { background: var(--accent); outline: none; }
+.help-popover {
+  position: fixed; left: 0; top: 0; z-index: 1000;
+  background: var(--panel); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 28px 12px 14px; max-width: 320px; width: max-content;
+  font-size: 12.5px; line-height: 1.55;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
+}
+.help-popover h4 { margin: 0 0 6px 0; font-size: 13px; font-weight: 600; color: var(--accent); }
+.help-popover-close {
+  position: absolute; top: 4px; right: 6px;
+  width: 20px; height: 20px; padding: 0;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 18px; line-height: 1;
+}
+.help-popover-close:hover { color: var(--text); }
+.stat .l { display: flex; align-items: center; gap: 0; }
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.between { justify-content: space-between; }
+.center { align-items: center; }
+.section-actions { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Lottie Website Tester <span class="v" id="version-tag">v1.0.0</span></h1>
+    <div class="tagline">Free testing tool for your personal domain — to get your own copy, just save this <code>.html</code> file.</div>
+  </div>
+  <nav>
+    <a href="#config-panel">Config</a>
+    <a href="#dashboard">Results</a>
+    <a href="#help">Help</a>
+  </nav>
+</header>
+
+<div class="container">
+
+<div class="banner info" id="distribute-banner">
+  <strong>Make this your own testing tool.</strong>
+  <div>
+    Download this single <code>.html</code> file and upload it anywhere on your domain —
+    any folder will do (e.g. <code>https://yoursite.com/tools/website-tester.html</code>
+    or <code>https://yoursite.com/website-tester.html</code>). Open it in your browser and
+    you'll have a self-contained crawler for that site — no installs, no servers, no dependencies.
+    <a href="javascript:void(0)" id="download-self">Download this file</a>.
+  </div>
+</div>
+
+<div id="env-banners"></div>
+
+<section id="config-panel" class="panel">
+  <div class="flex between center">
+    <h2>Crawl configuration</h2>
+    <button type="button" id="toggle-config" title="Collapse/expand">−</button>
+  </div>
+  <div id="config-body">
+    <div class="grid">
+      <div>
+        <label for="cfg-startUrl">Start URL <button type="button" class="help-icon" data-help="startUrl" aria-label="Explain Start URL">?</button></label>
+        <input type="url" id="cfg-startUrl" placeholder="https://example.com/">
+      </div>
+      <div>
+        <label for="cfg-maxPages">Max pages <button type="button" class="help-icon" data-help="maxPages" aria-label="Explain Max pages">?</button></label>
+        <input type="number" id="cfg-maxPages" min="1" max="100000" value="500">
+      </div>
+      <div>
+        <label for="cfg-maxDepth">Max depth <button type="button" class="help-icon" data-help="maxDepth" aria-label="Explain Max depth">?</button></label>
+        <input type="number" id="cfg-maxDepth" min="0" max="50" value="10">
+      </div>
+      <div>
+        <label for="cfg-concurrency">Concurrency <button type="button" class="help-icon" data-help="concurrency" aria-label="Explain Concurrency">?</button></label>
+        <input type="number" id="cfg-concurrency" min="1" max="32" value="4">
+      </div>
+      <div>
+        <label for="cfg-delayMs">Delay between requests (ms) <button type="button" class="help-icon" data-help="delayMs" aria-label="Explain Delay">?</button></label>
+        <input type="number" id="cfg-delayMs" min="0" max="60000" value="100">
+      </div>
+      <div>
+        <label for="cfg-timeoutMs">Request timeout (ms) <button type="button" class="help-icon" data-help="timeoutMs" aria-label="Explain Request timeout">?</button></label>
+        <input type="number" id="cfg-timeoutMs" min="500" max="120000" value="15000">
+      </div>
+      <div>
+        <label for="cfg-userAgent">User-Agent string <button type="button" class="help-icon" data-help="userAgent" aria-label="Explain User-Agent">?</button></label>
+        <input type="text" id="cfg-userAgent" value="">
+      </div>
+    </div>
+    <div class="grid" style="margin-top:10px;">
+      <div>
+        <label for="cfg-includePatterns">Include patterns <span class="muted">(regex, one per line; optional)</span> <button type="button" class="help-icon" data-help="includePatterns" aria-label="Explain Include patterns">?</button></label>
+        <textarea id="cfg-includePatterns" placeholder="/blog/&#10;/docs/.*"></textarea>
+      </div>
+      <div>
+        <label for="cfg-excludePatterns">Exclude patterns <span class="muted">(regex, one per line; optional)</span> <button type="button" class="help-icon" data-help="excludePatterns" aria-label="Explain Exclude patterns">?</button></label>
+        <textarea id="cfg-excludePatterns" placeholder="/admin&#10;\.pdf$"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="checkbox-row"><input type="checkbox" id="cfg-respectRobots" checked><label for="cfg-respectRobots">Respect <code>robots.txt</code></label> <button type="button" class="help-icon" data-help="respectRobots" aria-label="Explain Respect robots.txt">?</button></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-checkSubresources" checked><label for="cfg-checkSubresources">Check page subresources (images, stylesheets, scripts)</label> <button type="button" class="help-icon" data-help="checkSubresources" aria-label="Explain Check subresources">?</button></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-detectMixed" checked><label for="cfg-detectMixed">Detect mixed content + insecure links</label> <button type="button" class="help-icon" data-help="detectMixed" aria-label="Explain Detect mixed content">?</button></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-checkExternal"><label for="cfg-checkExternal">Check external links (best-effort)</label> <button type="button" class="help-icon" data-help="checkExternal" aria-label="Explain Check external links">?</button></div>
+    </div>
+    <div class="button-row">
+      <button type="button" id="btn-start" class="primary">Start crawl</button>
+      <button type="button" id="btn-pause" disabled>Pause</button>
+      <button type="button" id="btn-resume" disabled>Resume</button>
+      <button type="button" id="btn-stop" class="danger" disabled>Stop</button>
+      <button type="button" id="btn-clear">Clear results</button>
+      <button type="button" id="btn-reset-cfg">Reset config</button>
+      <button type="button" class="help-icon" data-help="controls" aria-label="Explain these buttons">?</button>
+    </div>
+  </div>
+</section>
+
+<section id="progress-panel" class="panel">
+  <div class="flex between center">
+    <h2>Progress <span id="status-label" class="muted" style="font-weight:400;font-size:12px;margin-left:8px;">idle</span></h2>
+    <div class="muted" id="throughput" style="font-size:12px;"></div>
+  </div>
+  <div class="progress-bar">
+    <div class="fill" id="progress-fill"></div>
+    <div class="label" id="progress-label">0 / 0</div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="n" id="stat-queued">0</div><div class="l">Queued <button type="button" class="help-icon" data-help="queued" aria-label="What does Queued mean?">?</button></div></div>
+    <div class="stat"><div class="n" id="stat-inflight">0</div><div class="l">In flight <button type="button" class="help-icon" data-help="inflight" aria-label="What does In flight mean?">?</button></div></div>
+    <div class="stat"><div class="n" id="stat-done">0</div><div class="l">Done <button type="button" class="help-icon" data-help="done" aria-label="What does Done mean?">?</button></div></div>
+    <div class="stat ok"><div class="n" id="stat-ok">0</div><div class="l">2xx <button type="button" class="help-icon" data-help="ok" aria-label="What does 2xx mean?">?</button></div></div>
+    <div class="stat redirect"><div class="n" id="stat-redirect">0</div><div class="l">3xx <button type="button" class="help-icon" data-help="redirect" aria-label="What does 3xx mean?">?</button></div></div>
+    <div class="stat warn"><div class="n" id="stat-4xx">0</div><div class="l">4xx <button type="button" class="help-icon" data-help="c4xx" aria-label="What does 4xx mean?">?</button></div></div>
+    <div class="stat err"><div class="n" id="stat-5xx">0</div><div class="l">5xx / err <button type="button" class="help-icon" data-help="c5xx" aria-label="What does 5xx / err mean?">?</button></div></div>
+    <div class="stat"><div class="n" id="stat-avg">0 ms</div><div class="l">Avg load <button type="button" class="help-icon" data-help="avgLoad" aria-label="What does Avg load mean?">?</button></div></div>
+    <div class="stat"><div class="n" id="stat-bytes">0 B</div><div class="l">Total bytes <button type="button" class="help-icon" data-help="totalBytes" aria-label="What does Total bytes mean?">?</button></div></div>
+  </div>
+</section>
+
+<section id="dashboard" class="panel">
+  <h2>Results</h2>
+  <div class="tabs" id="dash-tabs">
+    <span class="tab-group"><button type="button" data-tab="summary" class="active">Summary</button><button type="button" class="help-icon" data-help="tabSummary" aria-label="Explain Summary tab">?</button></span>
+    <span class="tab-group"><button type="button" data-tab="all">All URLs</button><button type="button" class="help-icon" data-help="tabAll" aria-label="Explain All URLs tab">?</button></span>
+    <span class="tab-group"><button type="button" data-tab="errors">Errors</button><button type="button" class="help-icon" data-help="tabErrors" aria-label="Explain Errors tab">?</button></span>
+    <span class="tab-group"><button type="button" data-tab="subresources">Subresources</button><button type="button" class="help-icon" data-help="tabSubresources" aria-label="Explain Subresources tab">?</button></span>
+    <span class="tab-group"><button type="button" data-tab="mixed">Mixed content</button><button type="button" class="help-icon" data-help="tabMixed" aria-label="Explain Mixed content tab">?</button></span>
+  </div>
+
+  <div id="tab-summary" class="tab-panel active">
+    <div id="summary-content" class="empty">Run a crawl to see the summary.</div>
+  </div>
+
+  <div id="tab-all" class="tab-panel">
+    <div class="toolbar">
+      <input type="text" id="filter-all" placeholder="Filter by URL, content-type, notes…">
+      <button type="button" class="help-icon" data-help="filterAll" aria-label="Explain filters and search">?</button>
+      <span class="chip active" data-filter="all">All</span>
+      <span class="chip" data-filter="2xx">2xx</span>
+      <span class="chip" data-filter="3xx">3xx</span>
+      <span class="chip" data-filter="4xx">4xx</span>
+      <span class="chip" data-filter="5xx">5xx</span>
+      <span class="chip" data-filter="err">errors</span>
+      <span class="chip" data-filter="html">HTML</span>
+      <span class="chip" data-filter="sub">subresources</span>
+    </div>
+    <div class="scroll-x"><div id="all-table" class="empty">No results yet.</div></div>
+  </div>
+
+  <div id="tab-errors" class="tab-panel">
+    <div id="errors-content" class="empty">No errors yet — run a crawl.</div>
+  </div>
+
+  <div id="tab-subresources" class="tab-panel">
+    <div id="subresources-content" class="empty">Subresource checking is enabled by default; results appear here after a crawl.</div>
+  </div>
+
+  <div id="tab-mixed" class="tab-panel">
+    <div id="mixed-content" class="empty">No mixed-content findings yet.</div>
+  </div>
+</section>
+
+<section id="exports-panel" class="panel">
+  <h2>Export</h2>
+  <p class="muted" style="margin:0 0 8px 0;">Download the full results or copy a summary to share.</p>
+  <div class="button-row">
+    <button type="button" id="btn-csv">Download CSV</button>
+    <button type="button" class="help-icon" data-help="exportCsv" aria-label="Explain CSV export">?</button>
+    <button type="button" id="btn-json">Download JSON</button>
+    <button type="button" class="help-icon" data-help="exportJson" aria-label="Explain JSON export">?</button>
+    <button type="button" id="btn-html">Download standalone HTML report</button>
+    <button type="button" class="help-icon" data-help="exportHtml" aria-label="Explain standalone HTML report">?</button>
+    <button type="button" id="btn-copy">Copy summary to clipboard</button>
+    <button type="button" class="help-icon" data-help="exportCopy" aria-label="Explain Copy summary">?</button>
+  </div>
+  <p class="muted" style="font-size:12px;margin-top:8px;">The standalone HTML report is self-contained — it can be opened directly from disk under <code>file://</code>.</p>
+</section>
+
+<section id="help" class="panel help-section">
+  <div class="flex between center">
+    <h2>Help</h2>
+    <button type="button" id="toggle-help" title="Collapse/expand">−</button>
+  </div>
+  <div id="help-body">
+    <h3>What this tool does</h3>
+    <p>Lottie Website Tester crawls a website starting from a URL you provide, recording the HTTP status code, page weight, load time, redirects, mixed-content issues, and broken subresources for every page it visits. Everything runs in your browser; no data is sent anywhere.</p>
+
+    <h3>Important — host this file on the site you want to test</h3>
+    <p>Because browsers enforce <strong>same-origin restrictions</strong>, you must upload this <code>.html</code> file somewhere on the website you want to test. It can live in any folder — for example <code>https://yoursite.com/website-tester.html</code>, <code>https://yoursite.com/tools/website-tester.html</code>, or <code>https://yoursite.com/private/admin/tester.html</code>. Just visit that URL in your browser. Opening the file directly with <code>file://</code> will <em>not</em> work — see the banner at the top.</p>
+    <p>The tool will only crawl pages within the same <em>registrable domain</em> (e.g. <code>example.com</code>, including subdomains like <code>blog.example.com</code>). Cross-subdomain requests are technically cross-origin and will show with reduced detail (status appears as "opaque"); same-origin requests show full results.</p>
+
+    <h3>Running a local web server</h3>
+    <p>If you want to test the tool against a local copy of a site, pick whichever of these is easiest on your machine. Run it inside the directory that contains your site files (and this HTML), then open the printed URL.</p>
+    <pre><code># Python 3 (built in to macOS and most Linux distros)
+python3 -m http.server 8000
+
+# Python 2 (legacy)
+python -m SimpleHTTPServer 8000
+
+# PHP (built in)
+php -S localhost:8000
+
+# Node.js — no install needed if you have npx
+npx serve
+# or
+npx http-server -p 8000
+
+# Ruby (built in to macOS)
+ruby -run -e httpd . -p 8000
+
+# Busybox (Alpine, embedded systems)
+busybox httpd -f -p 8000
+
+# Caddy
+caddy file-server --listen :8000</code></pre>
+    <p>If you use VS Code, the <em>Live Server</em> extension does the same thing with a click. After the server is running, visit <code>http://localhost:8000/website-tester.html</code>.</p>
+
+    <h3>Why a server is needed</h3>
+    <p>When a page is loaded from a <code>file://</code> URL, browsers refuse most <code>fetch()</code> requests for security reasons. A real HTTP server gives the page a proper <em>origin</em> that the network stack understands, which lets the crawler do its job.</p>
+
+    <h3>Feature reference</h3>
+    <h4>Start URL</h4>
+    <p>The page to begin crawling from. Defaults to the root of the site this tool is hosted on. Must use <code>http</code> or <code>https</code>.</p>
+
+    <h4>Max pages</h4>
+    <p>Hard upper bound on how many URLs the crawler will check. Stops the queue from running away on huge sites.</p>
+
+    <h4>Max depth</h4>
+    <p>How many link hops from the start URL the crawler will follow. The start URL is depth 0. Subresources do not count toward depth.</p>
+
+    <h4>Concurrency</h4>
+    <p>How many requests are in flight at once. Higher numbers crawl faster but put more load on the server. Most shared hosting handles 2–4 cleanly; bump to 8+ on infrastructure you control.</p>
+
+    <h4>Delay between requests (ms)</h4>
+    <p>Each worker waits this long before issuing its next request, on top of the natural request duration. Use this to be polite — a slow crawl is a friendly crawl.</p>
+
+    <h4>Request timeout (ms)</h4>
+    <p>If a request hasn't finished within this many milliseconds, it's aborted and recorded as a timeout error.</p>
+
+    <h4>Include / exclude patterns</h4>
+    <p>JavaScript regular expressions, one per line. A URL must match at least one include pattern (if any are set) and must not match any exclude pattern, to be crawled.</p>
+
+    <h4>Respect <code>robots.txt</code></h4>
+    <p>Fetches <code>/robots.txt</code> from the start URL's origin and skips any path your User-Agent is disallowed from. Strongly recommended.</p>
+
+    <h4>Check subresources</h4>
+    <p>For every HTML page found, also check that its <code>&lt;img&gt;</code>, <code>&lt;link&gt;</code>, <code>&lt;script&gt;</code>, and <code>&lt;source&gt;</code> URLs return 200. Broken assets appear in the Subresources tab and contribute to the page-weight total of their first-seen parent.</p>
+
+    <h4>Detect mixed content + insecure links</h4>
+    <p>If the start URL uses HTTPS, the tool flags any HTTP resource it finds. Mixed content is blocked by modern browsers and reported as a security concern.</p>
+
+    <h4>Check external links (no-cors best-effort)</h4>
+    <p>Off by default. When enabled, the tool sends a <code>no-cors</code> request to off-domain links. Browsers will hide the actual status code (you'll see "opaque"), but reachable vs unreachable will be observable.</p>
+
+    <h4>User-Agent string</h4>
+    <p>The tool can't actually override the browser's <code>User-Agent</code> request header (browsers forbid that), but this string is sent as a request header named <code>X-Crawler-UA</code> and is also used when matching <code>robots.txt</code> rules.</p>
+
+    <h4>Pause / Resume / Stop</h4>
+    <p><strong>Pause</strong> freezes the worker loop while letting in-flight requests finish. <strong>Resume</strong> picks up where you left off. <strong>Stop</strong> aborts everything and freezes the results so you can still export them.</p>
+
+    <h4>Exports</h4>
+    <ul>
+      <li><strong>CSV</strong> — one row per checked URL, opens in any spreadsheet.</li>
+      <li><strong>JSON</strong> — the full structured report, useful for tooling.</li>
+      <li><strong>Standalone HTML report</strong> — a separate <code>.html</code> file with the results baked in. No crawler, no config — read-only and shareable. Opens under <code>file://</code>.</li>
+      <li><strong>Copy summary to clipboard</strong> — a plain-text summary of totals, the slowest pages, the heaviest pages, and the full error list with referrers.</li>
+    </ul>
+
+    <h3>Limitations</h3>
+    <ul>
+      <li>JavaScript-rendered pages (SPAs) are not executed — only the initial HTML is parsed. Links injected at runtime won't be followed.</li>
+      <li>The tool uses <code>fetch()</code> from a browser, so it inherits browser CORS rules. Same-origin = full info; cross-origin = limited info.</li>
+      <li>Authentication cookies for the site this tool is hosted on are automatically included. To crawl as a logged-out user, open a private/incognito window.</li>
+      <li>Very large responses are downloaded in full to measure bytes. Use exclude patterns to skip giant binary files if needed.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  Lottie Website Tester — single-file, no dependencies, runs entirely in your browser.<br>
+  Generated by <a href="https://inventwithpython.com" target="_blank" rel="noopener noreferrer">Al Sweigart</a>.
+</footer>
+
+</div>
+
+<script>
+'use strict';
+
+/* ===================== Constants ===================== */
+const VERSION = '1.0.0';
+const DEFAULT_USER_AGENT = 'LottieWebsiteTester/' + VERSION + ' (+single-file tool)';
+
+// Small public-suffix list. Not exhaustive — covers common multi-part TLDs.
+// Anything not listed falls back to the last two labels.
+const PUBLIC_SUFFIXES = new Set([
+  'co.uk','ac.uk','gov.uk','org.uk','net.uk','sch.uk','me.uk','ltd.uk','plc.uk',
+  'co.jp','ne.jp','or.jp','ac.jp','go.jp','ed.jp','lg.jp',
+  'com.au','net.au','org.au','edu.au','gov.au','id.au','asn.au',
+  'co.nz','net.nz','org.nz','govt.nz','ac.nz','school.nz',
+  'co.za','org.za','net.za','gov.za','ac.za','edu.za',
+  'co.in','net.in','org.in','gen.in','firm.in','ind.in','ac.in','edu.in','res.in',
+  'com.br','net.br','org.br','gov.br','edu.br',
+  'com.mx','org.mx','gob.mx','edu.mx',
+  'com.ar','org.ar','net.ar','gov.ar','edu.ar',
+  'co.kr','or.kr','ne.kr','re.kr','pe.kr','go.kr','ac.kr',
+  'com.cn','net.cn','org.cn','gov.cn','edu.cn','ac.cn',
+  'com.hk','net.hk','org.hk','gov.hk','edu.hk',
+  'com.tw','net.tw','org.tw','gov.tw','edu.tw',
+  'com.sg','net.sg','org.sg','gov.sg','edu.sg',
+  'com.tr','net.tr','org.tr','gov.tr','edu.tr',
+  'co.il','org.il','net.il','gov.il','ac.il',
+  'com.ph','net.ph','org.ph','gov.ph','edu.ph',
+  'com.my','net.my','org.my','gov.my','edu.my',
+  'com.pk','net.pk','org.pk','gov.pk','edu.pk',
+  'com.eg','net.eg','org.eg','gov.eg','edu.eg',
+  'com.sa','net.sa','org.sa','gov.sa','edu.sa',
+  'com.ng','org.ng','gov.ng','edu.ng',
+  'com.co','net.co','org.co','gov.co','edu.co',
+  'com.pe','net.pe','org.pe','gob.pe','edu.pe',
+  'com.ve','net.ve','org.ve','gob.ve','edu.ve',
+  'com.uy','net.uy','org.uy','gub.uy','edu.uy',
+  'com.ec','net.ec','org.ec','gob.ec','edu.ec',
+  'github.io','gitlab.io','herokuapp.com','vercel.app','netlify.app','pages.dev','workers.dev'
+]);
+
+/* ===================== Help text ===================== */
+const HELP_TEXTS = {
+  queued: {
+    title: 'Queued',
+    body: 'Pages waiting in line to be checked. As the crawler works, every time it finds a link to a place it hasn’t visited yet, that link gets added here.'
+  },
+  inflight: {
+    title: 'In flight',
+    body: 'Pages being checked right at this moment. The number depends on the "Concurrency" setting — how many pages the crawler is allowed to look at simultaneously.'
+  },
+  done: {
+    title: 'Done',
+    body: 'Total number of URLs the crawler has finished checking. This counts both web pages and the files those pages load (images, styles, scripts).'
+  },
+  ok: {
+    title: '2xx — successful pages',
+    body: 'Pages that loaded successfully. "2xx" refers to HTTP status codes 200–299, which mean "everything worked." This is the number you want to be high.'
+  },
+  redirect: {
+    title: '3xx — redirects',
+    body: 'URLs that pointed the browser to a different address (HTTP codes 300–399). They still worked, but each redirect adds an extra round-trip. A few are normal (e.g. http → https); a lot of them slow your site down.'
+  },
+  c4xx: {
+    title: '4xx — broken links and other client errors',
+    body: 'URLs that returned an error (HTTP codes 400–499). The most famous is 404 (Not Found), which usually means a broken link — someone is being sent to a page that doesn’t exist. These are typically easy to fix: update the link or restore the missing page.'
+  },
+  c5xx: {
+    title: '5xx / err — server failures',
+    body: 'URLs where the server itself failed (HTTP codes 500–599) or didn’t respond at all (timeouts, network errors). These are the most serious. If you see these, your hosting may be misbehaving or your site has a bug that crashes when serving certain pages.'
+  },
+  avgLoad: {
+    title: 'Average load time',
+    body: 'The average time it took to download each URL. Lower is better. Visitors typically expect a page to start showing within about 2 seconds; longer than that and people start leaving.'
+  },
+  totalBytes: {
+    title: 'Total bytes downloaded',
+    body: 'The combined size of everything the crawler downloaded — pages plus images, stylesheets, and scripts. A "heavy" website uses more of your visitors’ mobile data and loads more slowly on slow connections.'
+  },
+  pages: {
+    title: 'Pages',
+    body: 'The HTML web pages found during the crawl — the kind of pages people actually visit and read.'
+  },
+  subresources: {
+    title: 'Subresources',
+    body: 'The files each page loads behind the scenes: images, CSS stylesheets, JavaScript files, fonts, and similar. A typical web page pulls in dozens of these without you seeing them as separate downloads.'
+  },
+  errors: {
+    title: 'Errors',
+    body: 'Total broken URLs found, counting both pages and subresources. Each one is a place where something isn’t working. Open the "Errors" tab to see exactly which links are broken and which page they were found on — so you know where to fix them.'
+  },
+  mixed: {
+    title: 'Mixed-content findings',
+    body: 'Places where an insecure (http://) resource appears on a secure (https://) page. Modern browsers block these for safety, which can break images, styles, or scripts. This commonly happens after switching a site to HTTPS without updating older asset URLs.'
+  },
+  elapsed: {
+    title: 'Elapsed time',
+    body: 'How long this crawl has been running. Useful for getting a sense of how long it takes to scan your whole site.'
+  },
+  started: {
+    title: 'Started at',
+    body: 'When you started this crawl. Helpful for comparing reports over time to see if your site is getting better or worse.'
+  },
+  startUrl: {
+    title: 'Start URL',
+    body: 'The web address where the crawler begins. From there it follows links to discover the rest of your site. Defaults to the home page of the site this tool is hosted on. Must start with http:// or https://.'
+  },
+  maxPages: {
+    title: 'Max pages',
+    body: 'The most URLs the crawler will check before stopping. Set lower (e.g. 50) for a quick sample, or higher to scan your whole site. Prevents an accidentally huge crawl on a giant site.'
+  },
+  maxDepth: {
+    title: 'Max depth',
+    body: 'How many "clicks" away from the starting page the crawler will follow. Depth 0 is just the starting page. Depth 1 also includes pages linked from it. Depth 2 includes pages linked from those, and so on. Most sites are fully reachable within depth 5–10.'
+  },
+  concurrency: {
+    title: 'Concurrency',
+    body: 'How many pages the crawler checks at the same time. Higher numbers finish faster but put more load on your server. 2–4 is gentle and works fine on shared hosting; 8 or higher is OK if you control the server.'
+  },
+  delayMs: {
+    title: 'Delay between requests',
+    body: 'How long the crawler waits between requests, in milliseconds (1000 ms = 1 second). Add delay to be polite to your server, or set to 0 to crawl as fast as possible.'
+  },
+  timeoutMs: {
+    title: 'Request timeout',
+    body: 'How long the crawler waits for a page to load before giving up, in milliseconds (1000 ms = 1 second). Pages that take longer than this are recorded as timeout errors.'
+  },
+  userAgent: {
+    title: 'User-Agent string',
+    body: 'A short label the crawler attaches to each request to identify itself. Web servers log this name, and rules in your robots.txt file can target specific names. If you don’t recognize this term, just leave it as the default.'
+  },
+  includePatterns: {
+    title: 'Include patterns',
+    body: 'If set, ONLY URLs matching one of these patterns are checked. Each line is a regular expression — a small pattern-matching language. Example: "/blog/" matches any URL containing /blog/. Leave blank to check every URL the crawler finds.'
+  },
+  excludePatterns: {
+    title: 'Exclude patterns',
+    body: 'URLs matching any of these patterns are skipped. Each line is a regular expression. Common uses: skip an admin section ("/admin"), skip large PDFs ("\\.pdf$"), or skip a calendar that generates infinite pages.'
+  },
+  respectRobots: {
+    title: 'Respect robots.txt',
+    body: 'Honor the rules in your website’s robots.txt file — the file where site owners tell crawlers which areas they’re allowed to look at. Strongly recommended to leave on. Turn off only if you’re intentionally testing areas that are normally off-limits to bots.'
+  },
+  checkSubresources: {
+    title: 'Check subresources',
+    body: 'Also check the files each page loads behind the scenes — images, stylesheets, scripts, fonts. Without this, the crawler only checks the pages themselves. Recommended on, so you catch missing images and other broken assets.'
+  },
+  detectMixed: {
+    title: 'Detect mixed content',
+    body: 'If your site uses HTTPS (the lock icon in browsers), this finds places where an insecure http:// resource sneaks in. Modern browsers block these, which can silently break images, styles, or scripts. Common after a site is switched to HTTPS without updating older URLs.'
+  },
+  checkExternal: {
+    title: 'Check external links',
+    body: 'By default the crawler only checks URLs on YOUR site. Turn this on to also check links that point to OTHER websites. Results for off-site URLs will be limited (browsers don’t let us see their full response), but you’ll know if those URLs are at least reachable.'
+  },
+  tabSummary: {
+    title: 'Summary tab',
+    body: 'A bird’s-eye view of the crawl: totals, the slowest and heaviest pages, and groups of errors. Start here to see whether your site is in good shape.'
+  },
+  tabAll: {
+    title: 'All URLs tab',
+    body: 'A full sortable, searchable, filterable table of every URL the crawler checked. Use the chips and search box to narrow down; click any column heading to sort by it.'
+  },
+  tabErrors: {
+    title: 'Errors tab',
+    body: 'A focused list of just the broken URLs, grouped by the page that linked to them. The grouping tells you WHERE to go to fix each broken link.'
+  },
+  tabSubresources: {
+    title: 'Subresources tab',
+    body: 'For each page, a breakdown of the images, stylesheets, scripts, and other files that page loads. Shows total size per page and flags any broken assets.'
+  },
+  tabMixed: {
+    title: 'Mixed content tab',
+    body: 'Insecure (http://) resources found on secure (https://) pages. Modern browsers block these — fix by updating the URLs to https:// or removing the references.'
+  },
+  exportCsv: {
+    title: 'CSV export',
+    body: 'Downloads a spreadsheet-compatible file with one row per URL. Open it in Excel, Google Sheets, Numbers, or any spreadsheet program. Useful for sharing results or doing your own analysis.'
+  },
+  exportJson: {
+    title: 'JSON export',
+    body: 'Downloads a structured data file containing the full crawl results plus your settings. Useful for processing the data with a script or another tool.'
+  },
+  exportHtml: {
+    title: 'Standalone HTML report',
+    body: 'Downloads a separate self-contained .html file with this report’s results baked in — no crawler, no configuration. You can email it, share it, or open it directly from your desktop, even when offline.'
+  },
+  exportCopy: {
+    title: 'Copy summary to clipboard',
+    body: 'Copies a short plain-text summary to your clipboard — totals, slowest pages, heaviest pages, and the list of errors. Paste it into an email, ticket, or chat to share results.'
+  },
+  filterAll: {
+    title: 'Filter & search the table',
+    body: 'Chips filter the table by status group (2xx, 3xx, 4xx, 5xx, errors) or kind (HTML pages vs. subresources). The search box matches text in URLs, content types, notes, referrers, and titles.'
+  },
+  controls: {
+    title: 'Start / Pause / Resume / Stop / Clear',
+    body: '"Start crawl" begins a new crawl. "Pause" temporarily stops adding new requests (in-flight ones finish). "Resume" picks up where pause left off. "Stop" aborts everything but keeps the results so you can still export them. "Clear results" wipes everything and goes back to idle.'
+  },
+};
+
+/* ===================== State ===================== */
+const DEFAULTS = {
+  startUrl: '',
+  maxPages: 500,
+  maxDepth: 10,
+  concurrency: 4,
+  delayMs: 100,
+  timeoutMs: 15000,
+  includePatterns: '',
+  excludePatterns: '',
+  respectRobots: true,
+  checkSubresources: true,
+  detectMixed: true,
+  checkExternal: false,
+  userAgent: DEFAULT_USER_AGENT,
+};
+
+const state = {
+  config: { ...DEFAULTS },
+  scope: null,                          // {origin, registrableDomain, startUrl, isHttps}
+  results: new Map(),                   // normalizedUrl -> result
+  queue: [],                            // [{url, depth, referrer, isSubresource, parentPage, kind}]
+  seen: new Set(),                      // normalized URLs added to queue
+  inFlight: 0,
+  status: 'idle',                       // idle | running | paused | stopped | done
+  startedAt: null,
+  finishedAt: null,
+  robotsRules: null,
+  abortControllers: new Set(),
+  pauseWaiters: [],
+  ui: { activeTab: 'summary', allFilter: 'all', allSearch: '', allSort: { col: 'url', dir: 'asc' } },
+  totalBytes: 0,
+  loadMsAccum: 0,
+  loadMsCount: 0,
+};
+
+/* ===================== DOM helpers ===================== */
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+function el(tag, attrs, ...children) {
+  const e = document.createElement(tag);
+  if (attrs) {
+    for (const k in attrs) {
+      const v = attrs[k];
+      if (v == null) continue;
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k === 'html') e.innerHTML = v;
+      else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v);
+    }
+  }
+  for (const c of children) {
+    if (c == null || c === false) continue;
+    e.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
+  }
+  return e;
+}
+function setText(idOrEl, text) {
+  const node = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  if (node) node.textContent = text;
+}
+
+/* ===================== URL utilities ===================== */
+function getRegistrableDomain(hostname) {
+  if (!hostname) return '';
+  hostname = hostname.toLowerCase();
+  // IPs and localhost stand alone
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return hostname;
+  if (hostname === 'localhost' || !hostname.includes('.')) return hostname;
+  const parts = hostname.split('.');
+  if (parts.length <= 2) return hostname;
+  const lastTwo = parts.slice(-2).join('.');
+  const lastThree = parts.slice(-3).join('.');
+  if (PUBLIC_SUFFIXES.has(lastTwo) && parts.length >= 3) return lastThree;
+  return lastTwo;
+}
+function sameRegistrableDomain(a, b) {
+  try {
+    return getRegistrableDomain(new URL(a).hostname) === getRegistrableDomain(new URL(b).hostname);
+  } catch (e) { return false; }
+}
+function sameOrigin(a, b) {
+  try { return new URL(a).origin === new URL(b).origin; } catch (e) { return false; }
+}
+function normalizeUrl(rawUrl, base) {
+  try {
+    const u = base ? new URL(rawUrl, base) : new URL(rawUrl);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+    u.hash = '';
+    u.hostname = u.hostname.toLowerCase();
+    if ((u.protocol === 'http:' && u.port === '80') || (u.protocol === 'https:' && u.port === '443')) u.port = '';
+    return u.href;
+  } catch (e) { return null; }
+}
+function pathOf(url) {
+  try { const u = new URL(url); return u.pathname + u.search; } catch (e) { return ''; }
+}
+
+/* ===================== Robots.txt ===================== */
+function parseRobotsTxt(text, userAgent) {
+  const lines = text.split(/\r?\n/);
+  const groups = [];
+  let cur = null;
+  let lastWasAgent = false;
+  for (let raw of lines) {
+    const line = raw.split('#')[0].trim();
+    if (!line) { lastWasAgent = false; continue; }
+    const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+    if (!m) continue;
+    const field = m[1].toLowerCase();
+    const value = m[2].trim();
+    if (field === 'user-agent') {
+      if (!lastWasAgent || !cur) { cur = { agents: [], rules: [] }; groups.push(cur); }
+      cur.agents.push(value.toLowerCase());
+      lastWasAgent = true;
+    } else if (field === 'allow' || field === 'disallow') {
+      if (!cur) { cur = { agents: ['*'], rules: [] }; groups.push(cur); }
+      cur.rules.push({ type: field, path: value });
+      lastWasAgent = false;
+    } else {
+      lastWasAgent = false;
+    }
+  }
+  const uaLower = (userAgent || '*').toLowerCase();
+  // Prefer most specific UA match.
+  let chosen = null;
+  let bestScore = -1;
+  for (const g of groups) {
+    for (const a of g.agents) {
+      if (a === '*') continue;
+      if (uaLower.includes(a) && a.length > bestScore) { chosen = g; bestScore = a.length; }
+    }
+  }
+  if (!chosen) chosen = groups.find(g => g.agents.includes('*')) || null;
+  const rules = chosen ? chosen.rules : [];
+
+  function patternToRegex(pattern) {
+    let re = '^';
+    for (let i = 0; i < pattern.length; i++) {
+      const c = pattern[i];
+      if (c === '*') re += '.*';
+      else if (c === '$' && i === pattern.length - 1) re += '$';
+      else re += c.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+    }
+    try { return new RegExp(re); } catch (e) { return null; }
+  }
+  const compiled = rules.map(r => ({ type: r.type, path: r.path, re: patternToRegex(r.path) }));
+  return {
+    allowed(path) {
+      let best = null;
+      for (const r of compiled) {
+        if (r.path === '') continue;
+        if (!r.re) continue;
+        if (r.re.test(path)) {
+          if (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.type === 'allow')) {
+            best = r;
+          }
+        }
+      }
+      return !best || best.type === 'allow';
+    }
+  };
+}
+
+/* ===================== Pattern compilation ===================== */
+function compilePatterns(text) {
+  return (text || '').split('\n').map(s => s.trim()).filter(Boolean).map(s => {
+    try { return new RegExp(s); } catch (e) { return null; }
+  }).filter(Boolean);
+}
+
+/* ===================== Number formatting ===================== */
+function fmtBytes(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(2) + ' MB';
+  return (n / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+}
+function fmtMs(ms) {
+  if (ms == null || isNaN(ms)) return '—';
+  if (ms < 1000) return Math.round(ms) + ' ms';
+  return (ms / 1000).toFixed(2) + ' s';
+}
+function statusClass(s) {
+  if (s === 'opaque') return 'opaque';
+  if (s === 0) return 'err';
+  if (s >= 200 && s < 300) return 'ok';
+  if (s >= 300 && s < 400) return 'redirect';
+  if (s >= 400 && s < 500) return 'warn';
+  if (s >= 500) return 'err';
+  return '';
+}
+
+/* ===================== Config persistence ===================== */
+function readConfigFromForm() {
+  const c = {
+    startUrl: $('#cfg-startUrl').value.trim(),
+    maxPages: clampInt($('#cfg-maxPages').value, 1, 100000, 500),
+    maxDepth: clampInt($('#cfg-maxDepth').value, 0, 50, 10),
+    concurrency: clampInt($('#cfg-concurrency').value, 1, 32, 4),
+    delayMs: clampInt($('#cfg-delayMs').value, 0, 60000, 100),
+    timeoutMs: clampInt($('#cfg-timeoutMs').value, 500, 120000, 15000),
+    includePatterns: $('#cfg-includePatterns').value,
+    excludePatterns: $('#cfg-excludePatterns').value,
+    respectRobots: $('#cfg-respectRobots').checked,
+    checkSubresources: $('#cfg-checkSubresources').checked,
+    detectMixed: $('#cfg-detectMixed').checked,
+    checkExternal: $('#cfg-checkExternal').checked,
+    userAgent: $('#cfg-userAgent').value.trim() || DEFAULT_USER_AGENT,
+  };
+  return c;
+}
+function writeConfigToForm(c) {
+  $('#cfg-startUrl').value = c.startUrl;
+  $('#cfg-maxPages').value = c.maxPages;
+  $('#cfg-maxDepth').value = c.maxDepth;
+  $('#cfg-concurrency').value = c.concurrency;
+  $('#cfg-delayMs').value = c.delayMs;
+  $('#cfg-timeoutMs').value = c.timeoutMs;
+  $('#cfg-includePatterns').value = c.includePatterns;
+  $('#cfg-excludePatterns').value = c.excludePatterns;
+  $('#cfg-respectRobots').checked = c.respectRobots;
+  $('#cfg-checkSubresources').checked = c.checkSubresources;
+  $('#cfg-detectMixed').checked = c.detectMixed;
+  $('#cfg-checkExternal').checked = c.checkExternal;
+  $('#cfg-userAgent').value = c.userAgent;
+}
+function clampInt(v, lo, hi, dflt) {
+  const n = parseInt(v, 10);
+  if (isNaN(n)) return dflt;
+  return Math.max(lo, Math.min(hi, n));
+}
+function saveConfig() {
+  try { localStorage.setItem('wt:config', JSON.stringify(state.config)); } catch (e) {}
+}
+function loadConfig() {
+  try {
+    const s = localStorage.getItem('wt:config');
+    if (s) {
+      const parsed = JSON.parse(s);
+      return { ...DEFAULTS, ...parsed };
+    }
+  } catch (e) {}
+  return null;
+}
+
+/* ===================== Environment detection ===================== */
+function detectEnvironment() {
+  const banners = $('#env-banners');
+  banners.innerHTML = '';
+  if (window.location.protocol === 'file:') {
+    banners.appendChild(el('div', { class: 'banner err' },
+      el('strong', null, 'You are viewing this file under file:// — fetches will fail.'),
+      el('div', null,
+        'Browsers refuse network requests from local files for security reasons. ' +
+        'Either upload this file to the website you want to test, or serve it through a local web server. ',
+        el('a', { href: '#help' }, 'See the Help section for one-line web-server commands.')
+      )
+    ));
+  }
+  return banners;
+}
+function checkStartUrlOrigin(startUrl) {
+  const banners = $('#env-banners');
+  // Remove any previous origin warning
+  const old = banners.querySelector('[data-kind="origin-warn"]');
+  if (old) banners.removeChild(old);
+  try {
+    const u = new URL(startUrl);
+    if (window.location.protocol === 'file:') return;
+    if (u.origin === window.location.origin) return;
+    const sameDomain = sameRegistrableDomain(startUrl, window.location.href);
+    if (sameDomain) {
+      banners.appendChild(el('div', { class: 'banner info', 'data-kind': 'origin-warn' },
+        el('strong', null, 'Start URL is on a different subdomain.'),
+        el('div', null,
+          'You\'re crawling within the same registrable domain but a different subdomain. Cross-subdomain requests will use no-cors and report as "opaque" (reachable / not reachable, but no status code).'
+        )
+      ));
+    } else {
+      banners.appendChild(el('div', { class: 'banner warn', 'data-kind': 'origin-warn' },
+        el('strong', null, 'Start URL is on a different origin from this tool.'),
+        el('div', null,
+          'For full reporting, upload this file somewhere on the site you want to test (any folder under ' + u.origin + ' works). ' +
+          'Cross-origin requests will be limited to "opaque" results.'
+        )
+      ));
+    }
+  } catch (e) {}
+}
+
+/* ===================== Scope computation ===================== */
+function computeScope(startUrl) {
+  const u = new URL(startUrl);
+  return {
+    origin: u.origin,
+    registrableDomain: getRegistrableDomain(u.hostname),
+    startUrl: startUrl,
+    isHttps: u.protocol === 'https:',
+  };
+}
+function isInScope(url, scope) {
+  try {
+    const u = new URL(url);
+    return getRegistrableDomain(u.hostname) === scope.registrableDomain;
+  } catch (e) { return false; }
+}
+
+/* ===================== Crawler ===================== */
+async function startCrawl() {
+  if (state.status === 'running' || state.status === 'paused') return;
+
+  // Read config
+  state.config = readConfigFromForm();
+  saveConfig();
+
+  if (!state.config.startUrl) {
+    alert('Please enter a Start URL.');
+    return;
+  }
+  let normalizedStart;
+  try {
+    normalizedStart = normalizeUrl(state.config.startUrl);
+    if (!normalizedStart) throw new Error('invalid');
+  } catch (e) {
+    alert('Start URL is invalid. Use a full http(s):// URL.');
+    return;
+  }
+
+  // Reset state
+  state.results = new Map();
+  state.queue = [];
+  state.seen = new Set();
+  state.inFlight = 0;
+  state.startedAt = Date.now();
+  state.finishedAt = null;
+  state.robotsRules = null;
+  state.abortControllers = new Set();
+  state.pauseWaiters = [];
+  state.totalBytes = 0;
+  state.loadMsAccum = 0;
+  state.loadMsCount = 0;
+  state.status = 'running';
+  state.scope = computeScope(normalizedStart);
+  state.includeRegexes = compilePatterns(state.config.includePatterns);
+  state.excludeRegexes = compilePatterns(state.config.excludePatterns);
+
+  setStatusButtons();
+  setText('status-label', 'starting…');
+  renderAll();
+
+  // robots.txt
+  if (state.config.respectRobots) {
+    try {
+      const robotsUrl = state.scope.origin + '/robots.txt';
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 10000);
+      const res = await fetch(robotsUrl, { signal: ctrl.signal, credentials: 'same-origin' });
+      clearTimeout(timer);
+      if (res.ok) {
+        const text = await res.text();
+        state.robotsRules = parseRobotsTxt(text, state.config.userAgent);
+      }
+    } catch (e) {
+      // No robots — treat as fully allowed
+    }
+  }
+
+  // Seed queue
+  enqueue({ url: normalizedStart, depth: 0, referrer: null, isSubresource: false, parentPage: null, kind: 'page' });
+
+  // Spawn workers
+  setText('status-label', 'running');
+  const workers = [];
+  for (let i = 0; i < state.config.concurrency; i++) workers.push(worker());
+  await Promise.all(workers);
+
+  if (state.status !== 'stopped') state.status = 'done';
+  state.finishedAt = Date.now();
+  setText('status-label', state.status);
+  setStatusButtons();
+  renderAll();
+}
+
+function enqueue(item) {
+  if (!item.url) return;
+  if (state.seen.has(item.url)) return;
+  // Check scope for crawl-into pages and subresources; external links may be checked via no-cors if enabled.
+  const inScope = isInScope(item.url, state.scope);
+  if (!inScope && !item.isSubresource) {
+    // External link
+    if (!state.config.checkExternal) return;
+    item.external = true;
+  }
+  // Include / exclude
+  const path = pathOf(item.url);
+  if (state.includeRegexes.length && !state.includeRegexes.some(r => r.test(item.url) || r.test(path))) return;
+  if (state.excludeRegexes.some(r => r.test(item.url) || r.test(path))) return;
+  // robots
+  if (state.config.respectRobots && state.robotsRules && inScope && !state.robotsRules.allowed(path)) {
+    // Record as robots-blocked so it's visible.
+    state.seen.add(item.url);
+    state.results.set(item.url, {
+      url: item.url, finalUrl: item.url, status: 'robots-blocked', statusText: 'Disallowed by robots.txt',
+      contentType: '', bytes: 0, loadMs: 0, depth: item.depth, referrer: item.referrer,
+      redirectChain: [], isHtml: false, isSubresource: !!item.isSubresource, parentPage: item.parentPage,
+      notes: ['robots-blocked'], external: !!item.external, kind: item.kind,
+    });
+    renderProgress();
+    return;
+  }
+  state.seen.add(item.url);
+  state.queue.push(item);
+}
+
+async function pauseGate() {
+  if (state.status !== 'paused') return;
+  await new Promise(resolve => state.pauseWaiters.push(resolve));
+}
+
+async function worker() {
+  while (true) {
+    if (state.status === 'stopped') return;
+    if (state.status === 'paused') { await pauseGate(); continue; }
+    if (state.results.size >= state.config.maxPages) return;
+
+    const item = state.queue.shift();
+    if (!item) {
+      if (state.inFlight === 0) return;
+      await new Promise(r => setTimeout(r, 80));
+      continue;
+    }
+    if (item.depth > state.config.maxDepth) continue;
+
+    state.inFlight++;
+    renderProgress();
+    if (state.config.delayMs > 0) await new Promise(r => setTimeout(r, state.config.delayMs));
+
+    try {
+      await fetchAndProcess(item);
+    } catch (e) {
+      // checkUrl already records errors; this is a safety net
+      console.error('worker error', e);
+    } finally {
+      state.inFlight--;
+      renderProgress();
+    }
+  }
+}
+
+async function fetchAndProcess(item) {
+  const startNow = performance.now();
+  const ctrl = new AbortController();
+  state.abortControllers.add(ctrl);
+  const timer = setTimeout(() => ctrl.abort(), state.config.timeoutMs);
+
+  const isCrossOrigin = !sameOrigin(item.url, window.location.href);
+  const useNoCors = isCrossOrigin || item.external;
+  const fetchOpts = {
+    signal: ctrl.signal,
+    credentials: useNoCors ? 'omit' : 'same-origin',
+    redirect: 'follow',
+    headers: {
+      'X-Crawler-UA': state.config.userAgent,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    },
+    mode: useNoCors ? 'no-cors' : 'cors',
+  };
+
+  let result = {
+    url: item.url, finalUrl: item.url, status: 0, statusText: '', contentType: '',
+    bytes: 0, loadMs: 0, depth: item.depth, referrer: item.referrer,
+    redirectChain: [], isHtml: false, isSubresource: !!item.isSubresource, parentPage: item.parentPage,
+    notes: [], external: !!item.external, kind: item.kind,
+  };
+
+  try {
+    const res = await fetch(item.url, fetchOpts);
+    const buf = await res.arrayBuffer();
+    const endNow = performance.now();
+    result.loadMs = endNow - startNow;
+    result.bytes = buf.byteLength;
+    result.finalUrl = res.url || item.url;
+
+    if (res.type === 'opaque') {
+      result.status = 'opaque';
+      result.statusText = 'opaque (no-cors)';
+      result.notes.push('opaque');
+    } else {
+      result.status = res.status;
+      result.statusText = res.statusText || '';
+      result.contentType = (res.headers.get('content-type') || '').toLowerCase();
+      result.isHtml = result.contentType.includes('text/html') || result.contentType.includes('application/xhtml');
+      if (result.finalUrl !== item.url) {
+        result.redirectChain.push(item.url, result.finalUrl);
+        result.notes.push('redirected');
+      }
+    }
+
+    // Mixed content
+    if (state.config.detectMixed && state.scope.isHttps && item.url.startsWith('http://')) {
+      result.notes.push('mixed-content');
+    }
+
+    state.totalBytes += result.bytes;
+    if (typeof result.loadMs === 'number') { state.loadMsAccum += result.loadMs; state.loadMsCount++; }
+
+    // Parse HTML
+    if (result.isHtml && !item.isSubresource && result.status >= 200 && result.status < 400) {
+      let text = '';
+      try { text = new TextDecoder('utf-8', { fatal: false }).decode(buf); } catch (e) {}
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      const baseEl = doc.querySelector('base[href]');
+      const baseHref = baseEl ? new URL(baseEl.getAttribute('href'), result.finalUrl).href : result.finalUrl;
+      const title = (doc.querySelector('title') || {}).textContent;
+      if (title) result.title = title.trim();
+
+      // Anchors
+      const seenInPage = new Set();
+      for (const a of doc.querySelectorAll('a[href]')) {
+        const href = a.getAttribute('href');
+        if (!href) continue;
+        if (href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) continue;
+        const norm = normalizeUrl(href, baseHref);
+        if (!norm || seenInPage.has(norm)) continue;
+        seenInPage.add(norm);
+        enqueue({ url: norm, depth: item.depth + 1, referrer: result.finalUrl, isSubresource: false, parentPage: null, kind: 'page' });
+      }
+
+      // Subresources
+      if (state.config.checkSubresources) {
+        const subSelectors = [
+          { sel: 'img[src]', attr: 'src', kind: 'img' },
+          { sel: 'script[src]', attr: 'src', kind: 'script' },
+          { sel: 'link[href]', attr: 'href', kind: 'link' },
+          { sel: 'source[src]', attr: 'src', kind: 'source' },
+        ];
+        for (const s of subSelectors) {
+          for (const node of doc.querySelectorAll(s.sel)) {
+            const v = node.getAttribute(s.attr);
+            if (!v) continue;
+            const norm = normalizeUrl(v, baseHref);
+            if (!norm) continue;
+            enqueue({ url: norm, depth: item.depth, referrer: result.finalUrl, isSubresource: true, parentPage: result.finalUrl, kind: s.kind });
+          }
+        }
+      }
+
+      // Insecure links / mixed content scan on links
+      if (state.config.detectMixed && state.scope.isHttps) {
+        for (const a of doc.querySelectorAll('a[href]')) {
+          const href = a.getAttribute('href');
+          if (!href) continue;
+          if (href.toLowerCase().startsWith('http://')) {
+            result.notes.push('has-insecure-link');
+            break;
+          }
+        }
+      }
+    }
+
+  } catch (e) {
+    const endNow = performance.now();
+    result.loadMs = endNow - startNow;
+    if (e.name === 'AbortError') {
+      result.status = 0; result.statusText = 'timeout'; result.notes.push('timeout');
+    } else {
+      result.status = 0; result.statusText = e.message || String(e); result.notes.push('network-error');
+    }
+  } finally {
+    clearTimeout(timer);
+    state.abortControllers.delete(ctrl);
+  }
+
+  state.results.set(item.url, result);
+  renderProgress();
+}
+
+function pauseCrawl() {
+  if (state.status !== 'running') return;
+  state.status = 'paused';
+  setText('status-label', 'paused');
+  setStatusButtons();
+}
+function resumeCrawl() {
+  if (state.status !== 'paused') return;
+  state.status = 'running';
+  setText('status-label', 'running');
+  const waiters = state.pauseWaiters;
+  state.pauseWaiters = [];
+  waiters.forEach(r => r());
+  setStatusButtons();
+}
+function stopCrawl() {
+  if (state.status !== 'running' && state.status !== 'paused') return;
+  state.status = 'stopped';
+  setText('status-label', 'stopped');
+  // Abort in-flight
+  state.abortControllers.forEach(c => { try { c.abort(); } catch (e) {} });
+  state.abortControllers.clear();
+  // Release any paused waiters so workers can exit
+  const waiters = state.pauseWaiters;
+  state.pauseWaiters = [];
+  waiters.forEach(r => r());
+  setStatusButtons();
+}
+function clearResults() {
+  if (state.status === 'running' || state.status === 'paused') {
+    if (!confirm('A crawl is in progress. Stop and clear?')) return;
+    stopCrawl();
+  }
+  state.results = new Map();
+  state.queue = [];
+  state.seen = new Set();
+  state.totalBytes = 0;
+  state.loadMsAccum = 0;
+  state.loadMsCount = 0;
+  state.startedAt = null;
+  state.finishedAt = null;
+  state.status = 'idle';
+  setText('status-label', 'idle');
+  setStatusButtons();
+  renderAll();
+}
+function setStatusButtons() {
+  const running = state.status === 'running';
+  const paused = state.status === 'paused';
+  $('#btn-start').disabled = running || paused;
+  $('#btn-pause').disabled = !running;
+  $('#btn-resume').disabled = !paused;
+  $('#btn-stop').disabled = !(running || paused);
+  $('#btn-clear').disabled = false;
+}
+
+/* ===================== Render ===================== */
+function renderAll() {
+  renderProgress();
+  renderSummary();
+  renderAllTable();
+  renderErrors();
+  renderSubresources();
+  renderMixed();
+}
+
+let renderProgressScheduled = false;
+function renderProgress() {
+  if (renderProgressScheduled) return;
+  renderProgressScheduled = true;
+  requestAnimationFrame(() => {
+    renderProgressScheduled = false;
+    const done = state.results.size;
+    const queued = state.queue.length;
+    const inflight = state.inFlight;
+    const max = state.config.maxPages || 1;
+    const total = Math.min(max, done + queued + inflight);
+    const pct = total ? Math.min(100, (done / total) * 100) : 0;
+    $('#progress-fill').style.width = pct + '%';
+    $('#progress-label').textContent = done + ' / ' + total + (done >= max ? ' (max)' : '');
+    setText('stat-queued', queued);
+    setText('stat-inflight', inflight);
+    setText('stat-done', done);
+
+    let ok = 0, redir = 0, c4 = 0, c5 = 0;
+    state.results.forEach(r => {
+      const s = r.status;
+      if (typeof s === 'number') {
+        if (s >= 200 && s < 300) ok++;
+        else if (s >= 300 && s < 400) redir++;
+        else if (s >= 400 && s < 500) c4++;
+        else if (s >= 500 || s === 0) c5++;
+      } else if (s === 'opaque') ok++;
+      else if (s === 'robots-blocked') c4++;
+    });
+    setText('stat-ok', ok);
+    setText('stat-redirect', redir);
+    setText('stat-4xx', c4);
+    setText('stat-5xx', c5);
+    setText('stat-avg', state.loadMsCount ? fmtMs(state.loadMsAccum / state.loadMsCount) : '0 ms');
+    setText('stat-bytes', fmtBytes(state.totalBytes));
+
+    if (state.startedAt) {
+      const elapsedS = (Date.now() - state.startedAt) / 1000;
+      const rate = elapsedS > 0 ? (done / elapsedS).toFixed(1) : '0.0';
+      $('#throughput').textContent = elapsedS.toFixed(1) + 's elapsed · ' + rate + ' req/s';
+    } else {
+      $('#throughput').textContent = '';
+    }
+
+    // Light-touch — also refresh summary if visible
+    if (state.ui.activeTab === 'summary') renderSummary();
+    else if (state.ui.activeTab === 'all') renderAllTable();
+    else if (state.ui.activeTab === 'errors') renderErrors();
+    else if (state.ui.activeTab === 'subresources') renderSubresources();
+    else if (state.ui.activeTab === 'mixed') renderMixed();
+  });
+}
+
+function resultsArray() {
+  return Array.from(state.results.values());
+}
+
+function renderSummary() {
+  const root = $('#summary-content');
+  const all = resultsArray();
+  if (!all.length) {
+    root.className = 'empty';
+    root.innerHTML = 'Run a crawl to see the summary.';
+    return;
+  }
+  root.className = '';
+  root.innerHTML = '';
+  const pages = all.filter(r => !r.isSubresource);
+  const subs = all.filter(r => r.isSubresource);
+  const errors = all.filter(r => isErrorStatus(r.status));
+  const mixed = all.filter(r => r.notes && (r.notes.includes('mixed-content') || r.notes.includes('has-insecure-link')));
+
+  const totalBytes = all.reduce((s, r) => s + (r.bytes || 0), 0);
+  const avg = state.loadMsCount ? state.loadMsAccum / state.loadMsCount : 0;
+  const elapsed = state.startedAt ? ((state.finishedAt || Date.now()) - state.startedAt) : 0;
+
+  root.appendChild(el('div', { class: 'stat-grid' },
+    statBox('Pages', pages.length, '', 'pages'),
+    statBox('Subresources', subs.length, '', 'subresources'),
+    statBox('Errors', errors.length, errors.length ? 'err' : '', 'errors'),
+    statBox('Mixed-content findings', mixed.length, mixed.length ? 'warn' : '', 'mixed'),
+    statBox('Total bytes', fmtBytes(totalBytes), '', 'totalBytes'),
+    statBox('Avg load', fmtMs(avg), '', 'avgLoad'),
+    statBox('Elapsed', fmtMs(elapsed), '', 'elapsed'),
+    statBox('Started', state.startedAt ? new Date(state.startedAt).toLocaleString() : '—', '', 'started'),
+  ));
+
+  // Slowest pages
+  const slowest = [...pages].filter(r => typeof r.loadMs === 'number').sort((a, b) => b.loadMs - a.loadMs).slice(0, 10);
+  if (slowest.length) {
+    root.appendChild(el('h3', null, 'Slowest 10 pages'));
+    root.appendChild(buildSimpleTable(slowest, ['URL', 'Status', 'Load'], r => [
+      urlCell(r.url), statusPill(r.status), fmtMs(r.loadMs)
+    ]));
+  }
+
+  // Heaviest pages
+  const heaviest = [...pages].sort((a, b) => (b.bytes || 0) - (a.bytes || 0)).slice(0, 10);
+  if (heaviest.length) {
+    root.appendChild(el('h3', null, 'Heaviest 10 pages'));
+    root.appendChild(buildSimpleTable(heaviest, ['URL', 'Status', 'Size'], r => [
+      urlCell(r.url), statusPill(r.status), fmtBytes(r.bytes)
+    ]));
+  }
+
+  // Errors grouped by status
+  if (errors.length) {
+    const byStatus = new Map();
+    errors.forEach(r => {
+      const k = String(r.status) + (r.statusText ? ' ' + r.statusText : '');
+      if (!byStatus.has(k)) byStatus.set(k, []);
+      byStatus.get(k).push(r);
+    });
+    root.appendChild(el('h3', null, 'Errors grouped by status'));
+    for (const [k, list] of byStatus) {
+      const d = el('details', null, el('summary', null, k + ' — ' + list.length + ' URL' + (list.length === 1 ? '' : 's')));
+      d.appendChild(buildSimpleTable(list, ['URL', 'Referrer', 'Load'], r => [
+        urlCell(r.url), urlCell(r.referrer || '—'), fmtMs(r.loadMs)
+      ]));
+      root.appendChild(d);
+    }
+  }
+
+  // Mixed content
+  if (mixed.length) {
+    root.appendChild(el('h3', null, 'Mixed-content findings'));
+    root.appendChild(buildSimpleTable(mixed.slice(0, 50), ['URL', 'Note', 'Referrer'], r => [
+      urlCell(r.url), (r.notes || []).join(', '), urlCell(r.referrer || '—')
+    ]));
+  }
+
+  // Broken subresources
+  const brokenSubs = subs.filter(r => isErrorStatus(r.status));
+  if (brokenSubs.length) {
+    root.appendChild(el('h3', null, 'Broken subresources'));
+    root.appendChild(buildSimpleTable(brokenSubs.slice(0, 100), ['URL', 'Kind', 'Parent page', 'Status'], r => [
+      urlCell(r.url), r.kind || '—', urlCell(r.parentPage || '—'), statusPill(r.status)
+    ]));
+  }
+}
+
+function statBox(label, n, cls, helpKey) {
+  const labelEl = el('div', { class: 'l' }, label);
+  if (helpKey) labelEl.appendChild(helpIcon(helpKey));
+  return el('div', { class: 'stat' + (cls ? ' ' + cls : '') },
+    el('div', { class: 'n', text: String(n) }),
+    labelEl
+  );
+}
+
+function helpIcon(key) {
+  return el('button', { type: 'button', class: 'help-icon', 'data-help': key, 'aria-label': 'Explain this stat' }, '?');
+}
+
+let openHelpKey = null;
+let openHelpEl = null;
+function showHelp(iconEl, key) {
+  hideHelp();
+  const data = HELP_TEXTS[key];
+  if (!data) return;
+  const pop = el('div', { class: 'help-popover' },
+    el('button', { type: 'button', class: 'help-popover-close', 'aria-label': 'Close', onclick: hideHelp }, '×'),
+    el('h4', { text: data.title }),
+    el('div', { text: data.body })
+  );
+  document.body.appendChild(pop);
+  openHelpEl = pop;
+  openHelpKey = key;
+  const r = iconEl.getBoundingClientRect();
+  const pr = pop.getBoundingClientRect();
+  const margin = 8;
+  let left = r.left + (r.width / 2) - (pr.width / 2);
+  if (left < margin) left = margin;
+  if (left + pr.width > window.innerWidth - margin) left = window.innerWidth - pr.width - margin;
+  let top = r.bottom + 6;
+  if (top + pr.height > window.innerHeight - margin) {
+    const above = r.top - pr.height - 6;
+    top = above >= margin ? above : margin;
+  }
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+}
+function hideHelp() {
+  if (openHelpEl) { try { openHelpEl.remove(); } catch (e) {} openHelpEl = null; openHelpKey = null; }
+}
+document.addEventListener('click', (e) => {
+  const icon = e.target.closest && e.target.closest('.help-icon');
+  if (icon) {
+    e.preventDefault(); e.stopPropagation();
+    const key = icon.getAttribute('data-help');
+    if (openHelpKey === key) hideHelp();
+    else showHelp(icon, key);
+    return;
+  }
+  if (openHelpEl && !(e.target.closest && e.target.closest('.help-popover'))) hideHelp();
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideHelp(); });
+window.addEventListener('resize', hideHelp);
+window.addEventListener('scroll', hideHelp, true);
+
+function isErrorStatus(s) {
+  if (typeof s === 'number') return s === 0 || s >= 400;
+  if (s === 'robots-blocked') return false;
+  return false;
+}
+
+function urlCell(u) {
+  if (!u) return el('span', { class: 'muted', text: '—' });
+  return el('a', { href: u, target: '_blank', rel: 'noopener noreferrer', text: u });
+}
+
+function statusPill(s) {
+  const cls = 'status-pill ' + statusClass(s);
+  return el('span', { class: cls, text: String(s == null ? '?' : s) });
+}
+
+function buildSimpleTable(rows, headers, rowFn) {
+  const wrap = el('div', { class: 'scroll-x' });
+  const t = el('table');
+  const thead = el('thead');
+  const trh = el('tr');
+  headers.forEach(h => trh.appendChild(el('th', { text: h })));
+  thead.appendChild(trh);
+  t.appendChild(thead);
+  const tbody = el('tbody');
+  rows.forEach(r => {
+    const cells = rowFn(r);
+    const tr = el('tr');
+    cells.forEach(c => {
+      const td = el('td', { class: typeof c === 'string' && c.startsWith('http') ? 'url-cell' : '' });
+      if (typeof c === 'string' || typeof c === 'number') td.textContent = c;
+      else if (c instanceof Node) td.appendChild(c);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  t.appendChild(tbody);
+  wrap.appendChild(t);
+  return wrap;
+}
+
+function renderAllTable() {
+  const root = $('#all-table');
+  const all = resultsArray();
+  if (!all.length) {
+    root.className = 'empty';
+    root.textContent = 'No results yet.';
+    return;
+  }
+  root.className = '';
+  let rows = all.slice();
+  const f = state.ui.allFilter;
+  if (f === '2xx') rows = rows.filter(r => typeof r.status === 'number' && r.status >= 200 && r.status < 300);
+  else if (f === '3xx') rows = rows.filter(r => typeof r.status === 'number' && r.status >= 300 && r.status < 400);
+  else if (f === '4xx') rows = rows.filter(r => typeof r.status === 'number' && r.status >= 400 && r.status < 500);
+  else if (f === '5xx') rows = rows.filter(r => typeof r.status === 'number' && r.status >= 500);
+  else if (f === 'err') rows = rows.filter(r => isErrorStatus(r.status) || (r.notes || []).includes('network-error') || (r.notes || []).includes('timeout'));
+  else if (f === 'html') rows = rows.filter(r => r.isHtml);
+  else if (f === 'sub') rows = rows.filter(r => r.isSubresource);
+
+  const search = (state.ui.allSearch || '').toLowerCase();
+  if (search) {
+    rows = rows.filter(r =>
+      (r.url || '').toLowerCase().includes(search) ||
+      (r.contentType || '').toLowerCase().includes(search) ||
+      (r.notes || []).join(' ').toLowerCase().includes(search) ||
+      (r.referrer || '').toLowerCase().includes(search) ||
+      (r.title || '').toLowerCase().includes(search)
+    );
+  }
+
+  const { col, dir } = state.ui.allSort;
+  rows.sort((a, b) => {
+    let av, bv;
+    if (col === 'url') { av = a.url; bv = b.url; }
+    else if (col === 'status') { av = typeof a.status === 'number' ? a.status : 9999; bv = typeof b.status === 'number' ? b.status : 9999; }
+    else if (col === 'bytes') { av = a.bytes || 0; bv = b.bytes || 0; }
+    else if (col === 'loadMs') { av = a.loadMs || 0; bv = b.loadMs || 0; }
+    else if (col === 'depth') { av = a.depth || 0; bv = b.depth || 0; }
+    else { av = a.url; bv = b.url; }
+    if (av < bv) return dir === 'asc' ? -1 : 1;
+    if (av > bv) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const tbl = el('table');
+  const thead = el('thead');
+  const trh = el('tr');
+  const cols = [
+    { key: 'url', label: 'URL' },
+    { key: 'status', label: 'Status' },
+    { key: 'contentType', label: 'Type' },
+    { key: 'bytes', label: 'Size' },
+    { key: 'loadMs', label: 'Load' },
+    { key: 'depth', label: 'Depth' },
+    { key: 'referrer', label: 'Referrer' },
+    { key: 'notes', label: 'Notes' },
+  ];
+  cols.forEach(c => {
+    const th = el('th', { text: c.label });
+    th.addEventListener('click', () => {
+      if (state.ui.allSort.col === c.key) state.ui.allSort.dir = state.ui.allSort.dir === 'asc' ? 'desc' : 'asc';
+      else { state.ui.allSort.col = c.key; state.ui.allSort.dir = 'asc'; }
+      renderAllTable();
+    });
+    if (state.ui.allSort.col === c.key) {
+      th.appendChild(el('span', { class: 'arrow', text: state.ui.allSort.dir === 'asc' ? '▲' : '▼' }));
+    }
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  tbl.appendChild(thead);
+
+  const tbody = el('tbody');
+  rows.forEach(r => {
+    const tr = el('tr');
+    tr.appendChild(el('td', { class: 'url-cell' }, urlCell(r.url)));
+    tr.appendChild(el('td', null, statusPill(r.status)));
+    tr.appendChild(el('td', { text: shortType(r.contentType) }));
+    tr.appendChild(el('td', { text: fmtBytes(r.bytes) }));
+    tr.appendChild(el('td', { text: fmtMs(r.loadMs) }));
+    tr.appendChild(el('td', { text: r.isSubresource ? '—' : String(r.depth) }));
+    tr.appendChild(el('td', { class: 'url-cell' }, r.referrer ? urlCell(r.referrer) : el('span', { class: 'muted', text: '—' })));
+    tr.appendChild(el('td', { class: 'notes' }, ...(r.notes || []).map(n => el('span', { class: 'note-tag', text: n }))));
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+
+  root.innerHTML = '';
+  root.appendChild(tbl);
+
+  if (!rows.length) {
+    root.innerHTML = '';
+    root.className = 'empty';
+    root.textContent = 'No rows match the current filter.';
+  }
+}
+
+function shortType(t) {
+  if (!t) return '—';
+  return t.split(';')[0].trim();
+}
+
+function renderErrors() {
+  const root = $('#errors-content');
+  const errors = resultsArray().filter(r => isErrorStatus(r.status));
+  if (!errors.length) {
+    root.className = 'empty';
+    root.textContent = 'No errors found — great!';
+    return;
+  }
+  root.className = '';
+  root.innerHTML = '';
+  // Group by referrer (the page that linked to the broken URL)
+  const byRef = new Map();
+  errors.forEach(r => {
+    const k = r.referrer || '(no referrer / start URL)';
+    if (!byRef.has(k)) byRef.set(k, []);
+    byRef.get(k).push(r);
+  });
+  root.appendChild(el('p', { class: 'muted', text: errors.length + ' broken URL' + (errors.length === 1 ? '' : 's') + ' grouped by the page that linked to them.' }));
+  for (const [ref, list] of byRef) {
+    const group = el('div', { class: 'group-page' });
+    group.appendChild(el('div', { class: 'group-head' },
+      ref.startsWith('http') ? urlCell(ref) : document.createTextNode(ref)
+    ));
+    group.appendChild(buildSimpleTable(list, ['Broken URL', 'Status', 'Kind'], r => [
+      urlCell(r.url), statusPill(r.status), r.isSubresource ? (r.kind || 'subresource') : 'link'
+    ]));
+    root.appendChild(group);
+  }
+}
+
+function renderSubresources() {
+  const root = $('#subresources-content');
+  const subs = resultsArray().filter(r => r.isSubresource);
+  if (!subs.length) {
+    root.className = 'empty';
+    root.textContent = 'No subresources have been checked yet.';
+    return;
+  }
+  root.className = '';
+  root.innerHTML = '';
+  const byParent = new Map();
+  subs.forEach(r => {
+    const k = r.parentPage || '(unknown parent)';
+    if (!byParent.has(k)) byParent.set(k, []);
+    byParent.get(k).push(r);
+  });
+  root.appendChild(el('p', { class: 'muted', text: subs.length + ' subresource' + (subs.length === 1 ? '' : 's') + ' across ' + byParent.size + ' page' + (byParent.size === 1 ? '' : 's') + '.' }));
+  for (const [parent, list] of byParent) {
+    const totalBytes = list.reduce((s, r) => s + (r.bytes || 0), 0);
+    const broken = list.filter(r => isErrorStatus(r.status));
+    const group = el('div', { class: 'group-page' });
+    const head = el('div', { class: 'group-head' });
+    head.appendChild(parent.startsWith('http') ? urlCell(parent) : document.createTextNode(parent));
+    head.appendChild(el('div', { class: 'muted', style: 'font-weight:400;font-size:12px;margin-top:2px;', text:
+      list.length + ' subresources · ' + fmtBytes(totalBytes) + (broken.length ? ' · ' + broken.length + ' broken' : '') }));
+    group.appendChild(head);
+    group.appendChild(buildSimpleTable(list, ['URL', 'Kind', 'Status', 'Size', 'Load'], r => [
+      urlCell(r.url), r.kind || '—', statusPill(r.status), fmtBytes(r.bytes), fmtMs(r.loadMs)
+    ]));
+    root.appendChild(group);
+  }
+}
+
+function renderMixed() {
+  const root = $('#mixed-content');
+  const mixed = resultsArray().filter(r => (r.notes || []).some(n => n === 'mixed-content' || n === 'has-insecure-link'));
+  if (!mixed.length) {
+    root.className = 'empty';
+    root.textContent = state.scope && state.scope.isHttps
+      ? 'No mixed-content findings — your HTTPS pages are clean.'
+      : 'Mixed-content detection requires the start URL to use https://.';
+    return;
+  }
+  root.className = '';
+  root.innerHTML = '';
+  root.appendChild(el('p', { class: 'muted', text: mixed.length + ' finding' + (mixed.length === 1 ? '' : 's') + '. Mixed content is blocked by modern browsers and can break pages.' }));
+  root.appendChild(buildSimpleTable(mixed, ['URL', 'Issue', 'Referrer'], r => [
+    urlCell(r.url),
+    (r.notes || []).filter(n => n === 'mixed-content' || n === 'has-insecure-link').join(', '),
+    urlCell(r.referrer || '—')
+  ]));
+}
+
+/* ===================== Exports ===================== */
+function csvEscape(v) {
+  if (v == null) return '';
+  const s = String(v);
+  if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+function exportCSV() {
+  const rows = resultsArray();
+  if (!rows.length) { alert('Nothing to export yet.'); return; }
+  const headers = ['url','finalUrl','status','statusText','contentType','bytes','loadMs','depth','referrer','isHtml','isSubresource','kind','parentPage','title','notes','external'];
+  const lines = [headers.join(',')];
+  for (const r of rows) {
+    const row = [
+      r.url, r.finalUrl, r.status, r.statusText, r.contentType, r.bytes, Math.round(r.loadMs || 0),
+      r.isSubresource ? '' : r.depth, r.referrer, !!r.isHtml, !!r.isSubresource, r.kind || '',
+      r.parentPage || '', r.title || '', (r.notes || []).join('|'), !!r.external
+    ].map(csvEscape).join(',');
+    lines.push(row);
+  }
+  downloadBlob(lines.join('\r\n'), 'text/csv;charset=utf-8', filenameStamp('website-tester', 'csv'));
+}
+function exportJSON() {
+  const rows = resultsArray();
+  if (!rows.length) { alert('Nothing to export yet.'); return; }
+  const payload = {
+    meta: {
+      tool: 'Lottie Website Tester ' + VERSION,
+      startedAt: state.startedAt ? new Date(state.startedAt).toISOString() : null,
+      finishedAt: state.finishedAt ? new Date(state.finishedAt).toISOString() : null,
+      config: state.config,
+      scope: state.scope,
+    },
+    results: rows,
+  };
+  downloadBlob(JSON.stringify(payload, null, 2), 'application/json', filenameStamp('website-tester', 'json'));
+}
+function exportHTMLReport() {
+  const rows = resultsArray();
+  if (!rows.length) { alert('Nothing to export yet.'); return; }
+  const payload = {
+    meta: {
+      tool: 'Lottie Website Tester ' + VERSION,
+      startedAt: state.startedAt ? new Date(state.startedAt).toISOString() : null,
+      finishedAt: state.finishedAt ? new Date(state.finishedAt).toISOString() : null,
+      config: state.config,
+      scope: state.scope,
+    },
+    results: rows,
+  };
+  const html = buildStandaloneReport(payload);
+  downloadBlob(html, 'text/html;charset=utf-8', filenameStamp('website-tester-report', 'html'));
+}
+function copySummary() {
+  const rows = resultsArray();
+  if (!rows.length) { alert('Nothing to copy yet.'); return; }
+  const pages = rows.filter(r => !r.isSubresource);
+  const subs = rows.filter(r => r.isSubresource);
+  const errors = rows.filter(r => isErrorStatus(r.status));
+  const slow = [...pages].filter(r => typeof r.loadMs === 'number').sort((a, b) => b.loadMs - a.loadMs).slice(0, 10);
+  const heavy = [...pages].sort((a, b) => (b.bytes || 0) - (a.bytes || 0)).slice(0, 10);
+  const lines = [];
+  lines.push('Lottie Website Tester summary');
+  lines.push('  Start URL : ' + (state.scope ? state.scope.startUrl : ''));
+  lines.push('  Started   : ' + (state.startedAt ? new Date(state.startedAt).toISOString() : '—'));
+  lines.push('  Finished  : ' + (state.finishedAt ? new Date(state.finishedAt).toISOString() : '—'));
+  lines.push('  Pages     : ' + pages.length);
+  lines.push('  Subres    : ' + subs.length);
+  lines.push('  Errors    : ' + errors.length);
+  lines.push('  Avg load  : ' + (state.loadMsCount ? fmtMs(state.loadMsAccum / state.loadMsCount) : '0 ms'));
+  lines.push('  Total     : ' + fmtBytes(state.totalBytes));
+  lines.push('');
+  if (slow.length) {
+    lines.push('Slowest pages:');
+    slow.forEach(r => lines.push('  ' + fmtMs(r.loadMs).padStart(8) + '  ' + r.url));
+    lines.push('');
+  }
+  if (heavy.length) {
+    lines.push('Heaviest pages:');
+    heavy.forEach(r => lines.push('  ' + fmtBytes(r.bytes).padStart(10) + '  ' + r.url));
+    lines.push('');
+  }
+  if (errors.length) {
+    lines.push('Errors (' + errors.length + '):');
+    errors.forEach(r => lines.push('  ' + String(r.status).padStart(4) + '  ' + r.url + (r.referrer ? '   <- ' + r.referrer : '')));
+  }
+  const text = lines.join('\n');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => flashMsg('Summary copied to clipboard.'),
+      () => fallbackCopy(text)
+    );
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); flashMsg('Summary copied to clipboard.'); }
+  catch (e) { alert('Could not copy automatically. Here is the summary:\n\n' + text); }
+  document.body.removeChild(ta);
+}
+function flashMsg(msg) {
+  const note = el('div', { class: 'banner info', style: 'margin-top:8px;', text: msg });
+  $('#exports-panel').appendChild(note);
+  setTimeout(() => { try { $('#exports-panel').removeChild(note); } catch (e) {} }, 2200);
+}
+function downloadBlob(content, mime, name) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = el('a', { href: url, download: name });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function filenameStamp(base, ext) {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const stamp = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+  return base + '-' + stamp + '.' + ext;
+}
+
+/* ===================== Standalone HTML report ===================== */
+function buildStandaloneReport(payload) {
+  const css = [
+    'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;background:#f7f8fa;color:#1f2330;font-size:14px;line-height:1.5;}',
+    '.container{max-width:1200px;margin:0 auto;padding:16px;}',
+    'h1{font-size:20px;margin:0 0 8px;}',
+    'h2{font-size:15px;margin:18px 0 8px;}',
+    '.meta{color:#6b7280;font-size:12px;margin-bottom:12px;}',
+    '.panel{background:#fff;border:1px solid #e3e6ec;border-radius:8px;padding:14px;margin:12px 0;}',
+    '.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;}',
+    '.stat{background:#fafbfd;border:1px solid #e3e6ec;border-radius:6px;padding:10px;}',
+    '.stat .n{font-size:18px;font-weight:600;}',
+    '.stat .l{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}',
+    'table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}',
+    'th{text-align:left;padding:6px;background:#fafbfd;border-bottom:1px solid #e3e6ec;cursor:pointer;}',
+    'td{padding:6px;border-bottom:1px solid #e3e6ec;vertical-align:top;}',
+    '.url-cell{word-break:break-all;max-width:520px;}',
+    '.url-cell a{color:#2563eb;text-decoration:none;}',
+    '.pill{display:inline-block;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:700;}',
+    '.pill.ok{background:#dcfce7;color:#15803d;}',
+    '.pill.redirect{background:#ede9fe;color:#6d28d9;}',
+    '.pill.warn{background:#fef3c7;color:#a16207;}',
+    '.pill.err{background:#fee2e2;color:#b91c1c;}',
+    '.pill.opaque{background:#f1f3f7;color:#6b7280;}',
+    '.muted{color:#6b7280;}',
+    '.tabs{display:flex;gap:4px;border-bottom:1px solid #e3e6ec;margin-bottom:8px;flex-wrap:wrap;}',
+    '.tabs button{background:none;border:none;padding:8px 12px;border-bottom:2px solid transparent;cursor:pointer;color:#6b7280;font:inherit;}',
+    '.tabs button.active{color:#1f2330;border-bottom-color:#2563eb;}',
+    '.tab{display:none;}.tab.active{display:block;}',
+    '.scroll{overflow-x:auto;}',
+    'details{margin:6px 0;}details>summary{cursor:pointer;padding:4px 0;font-weight:500;}',
+    '@media (prefers-color-scheme:dark){body{background:#0f1116;color:#e6e8ee;}.panel{background:#181b22;border-color:#2a2f3a;}.stat,th{background:#1d2129;border-color:#2a2f3a;}td{border-bottom-color:#2a2f3a;}.url-cell a{color:#60a5fa;}.pill.ok{background:#14532d;color:#86efac;}.pill.redirect{background:#3b1f74;color:#c4b5fd;}.pill.warn{background:#5a3712;color:#fcd34d;}.pill.err{background:#561818;color:#fca5a5;}.pill.opaque{background:#11141a;color:#9aa3b2;}.muted{color:#9aa3b2;}.tabs{border-bottom-color:#2a2f3a;}.tabs button{color:#9aa3b2;}.tabs button.active{color:#e6e8ee;}}',
+  ].join('');
+
+  const dataJson = JSON.stringify(payload).replace(/</g, '\\u003c');
+
+  const reportScript = [
+    "(function(){",
+    "var data = window.__WT_REPORT_DATA__;",
+    "function fmtBytes(n){if(n==null||isNaN(n))return '—';if(n<1024)return n+' B';if(n<1048576)return (n/1024).toFixed(1)+' KB';if(n<1073741824)return (n/1048576).toFixed(2)+' MB';return (n/1073741824).toFixed(2)+' GB';}",
+    "function fmtMs(ms){if(ms==null||isNaN(ms))return '—';if(ms<1000)return Math.round(ms)+' ms';return (ms/1000).toFixed(2)+' s';}",
+    "function statusClass(s){if(s==='opaque')return 'opaque';if(s===0)return 'err';if(typeof s!=='number')return '';if(s>=200&&s<300)return 'ok';if(s>=300&&s<400)return 'redirect';if(s>=400&&s<500)return 'warn';if(s>=500)return 'err';return '';}",
+    "function isError(s){return s===0 || (typeof s==='number' && s>=400);}",
+    "function el(tag,attrs){var e=document.createElement(tag);if(attrs)for(var k in attrs){if(k==='class')e.className=attrs[k];else if(k==='text')e.textContent=attrs[k];else e.setAttribute(k,attrs[k]);}for(var i=2;i<arguments.length;i++){var c=arguments[i];if(c==null)continue;e.appendChild(typeof c==='string'?document.createTextNode(c):c);}return e;}",
+    "function pill(s){return el('span',{class:'pill '+statusClass(s),text:String(s==null?'?':s)});}",
+    "function urlCell(u){if(!u)return el('span',{class:'muted',text:'—'});return el('a',{href:u,target:'_blank',rel:'noopener',text:u});}",
+    "function statBox(label,n,cls){return el('div',{class:'stat'+(cls?' '+cls:'')},el('div',{class:'n',text:String(n)}),el('div',{class:'l',text:label}));}",
+    "var rows=data.results||[];",
+    "var pages=rows.filter(function(r){return !r.isSubresource;});",
+    "var subs=rows.filter(function(r){return r.isSubresource;});",
+    "var errors=rows.filter(function(r){return isError(r.status);});",
+    "var mixed=rows.filter(function(r){return (r.notes||[]).some(function(n){return n==='mixed-content'||n==='has-insecure-link';});});",
+    "var totalBytes=rows.reduce(function(s,r){return s+(r.bytes||0);},0);",
+    "var avg=0,n=0;rows.forEach(function(r){if(typeof r.loadMs==='number'){avg+=r.loadMs;n++;}});avg=n?avg/n:0;",
+    "document.getElementById('meta').textContent='Generated '+(data.meta.finishedAt||data.meta.startedAt||'')+' · scope: '+(data.meta.scope&&data.meta.scope.registrableDomain||'')+' · start: '+(data.meta.scope&&data.meta.scope.startUrl||'');",
+    "var summary=document.getElementById('summary');",
+    "summary.appendChild(el('div',{class:'stat-grid'},statBox('Pages',pages.length),statBox('Subresources',subs.length),statBox('Errors',errors.length),statBox('Mixed content',mixed.length),statBox('Total bytes',fmtBytes(totalBytes)),statBox('Avg load',fmtMs(avg))));",
+    "var slow=pages.slice().sort(function(a,b){return (b.loadMs||0)-(a.loadMs||0);}).slice(0,10);",
+    "var heavy=pages.slice().sort(function(a,b){return (b.bytes||0)-(a.bytes||0);}).slice(0,10);",
+    "function table(headers,rows,fn){var w=el('div',{class:'scroll'});var t=el('table');var th=el('thead');var trh=el('tr');headers.forEach(function(h){trh.appendChild(el('th',{text:h}));});th.appendChild(trh);t.appendChild(th);var tb=el('tbody');rows.forEach(function(r){var tr=el('tr');fn(r).forEach(function(c){var td=el('td');if(typeof c==='string')td.textContent=c;else if(c instanceof Node)td.appendChild(c);tr.appendChild(td);});tb.appendChild(tr);});t.appendChild(tb);w.appendChild(t);return w;}",
+    "if(slow.length){summary.appendChild(el('h2',{text:'Slowest 10 pages'}));summary.appendChild(table(['URL','Status','Load'],slow,function(r){return [urlCell(r.url),pill(r.status),fmtMs(r.loadMs)];}));}",
+    "if(heavy.length){summary.appendChild(el('h2',{text:'Heaviest 10 pages'}));summary.appendChild(table(['URL','Status','Size'],heavy,function(r){return [urlCell(r.url),pill(r.status),fmtBytes(r.bytes)];}));}",
+    "if(errors.length){summary.appendChild(el('h2',{text:'Errors ('+errors.length+')'}));summary.appendChild(table(['URL','Status','Referrer','Kind'],errors,function(r){return [urlCell(r.url),pill(r.status),urlCell(r.referrer),r.isSubresource?(r.kind||'subresource'):'link'];}));}",
+    "if(mixed.length){summary.appendChild(el('h2',{text:'Mixed content ('+mixed.length+')'}));summary.appendChild(table(['URL','Issue','Referrer'],mixed,function(r){return [urlCell(r.url),(r.notes||[]).filter(function(n){return n==='mixed-content'||n==='has-insecure-link';}).join(', '),urlCell(r.referrer)];}));}",
+    "var allBody=document.getElementById('all');",
+    "allBody.appendChild(table(['URL','Status','Type','Size','Load','Depth','Referrer'],rows,function(r){return [urlCell(r.url),pill(r.status),(r.contentType||'—').split(';')[0],fmtBytes(r.bytes),fmtMs(r.loadMs),r.isSubresource?'—':String(r.depth||0),urlCell(r.referrer)];}));",
+    "var tabs=document.querySelectorAll('.tabs button');var panes=document.querySelectorAll('.tab');tabs.forEach(function(b){b.addEventListener('click',function(){tabs.forEach(function(x){x.classList.remove('active');});panes.forEach(function(x){x.classList.remove('active');});b.classList.add('active');document.getElementById('tab-'+b.dataset.tab).classList.add('active');});});",
+    "})();"
+  ].join('\n');
+
+  return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lottie Website Tester Report</title><style>' + css + '</style></head><body><div class="container"><h1>Lottie Website Tester report</h1><div class="meta" id="meta"></div><div class="tabs"><button data-tab="summary" class="active">Summary</button><button data-tab="all">All URLs</button></div><div id="tab-summary" class="tab active panel"><div id="summary"></div></div><div id="tab-all" class="tab panel"><div id="all"></div></div><footer style="padding:20px 0;color:#6b7280;font-size:12px;text-align:center;">Generated by <a href="https://inventwithpython.com" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:none;">Al Sweigart</a> · Lottie Website Tester</footer></div><script>window.__WT_REPORT_DATA__=' + dataJson + ';</' + 'script><script>' + reportScript + '</' + 'script></body></html>';
+}
+
+/* ===================== UI wiring ===================== */
+function wireUI() {
+  // Tabs
+  $$('#dash-tabs button[data-tab]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.ui.activeTab = b.dataset.tab;
+      $$('#dash-tabs button[data-tab]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      $$('.tab-panel').forEach(p => p.classList.remove('active'));
+      $('#tab-' + b.dataset.tab).classList.add('active');
+      renderAll();
+    });
+  });
+
+  // Buttons
+  $('#btn-start').addEventListener('click', startCrawl);
+  $('#btn-pause').addEventListener('click', pauseCrawl);
+  $('#btn-resume').addEventListener('click', resumeCrawl);
+  $('#btn-stop').addEventListener('click', stopCrawl);
+  $('#btn-clear').addEventListener('click', clearResults);
+  $('#btn-reset-cfg').addEventListener('click', () => {
+    state.config = { ...DEFAULTS };
+    state.config.userAgent = DEFAULT_USER_AGENT;
+    state.config.startUrl = window.location.protocol === 'file:' ? '' : window.location.origin + '/';
+    writeConfigToForm(state.config);
+    saveConfig();
+  });
+
+  // Exports
+  $('#btn-csv').addEventListener('click', exportCSV);
+  $('#btn-json').addEventListener('click', exportJSON);
+  $('#btn-html').addEventListener('click', exportHTMLReport);
+  $('#btn-copy').addEventListener('click', copySummary);
+
+  // All-tab filter chips
+  $$('#tab-all .chip').forEach(c => {
+    c.addEventListener('click', () => {
+      $$('#tab-all .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      state.ui.allFilter = c.dataset.filter;
+      renderAllTable();
+    });
+  });
+  $('#filter-all').addEventListener('input', e => {
+    state.ui.allSearch = e.target.value;
+    renderAllTable();
+  });
+
+  // Start URL: re-check origin warning whenever it changes
+  $('#cfg-startUrl').addEventListener('change', () => {
+    const v = $('#cfg-startUrl').value.trim();
+    if (v) checkStartUrlOrigin(v);
+  });
+
+  // Self-download link in the distribute banner
+  const selfLink = $('#download-self');
+  if (selfLink) {
+    selfLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        if (window.location.protocol === 'file:') {
+          alert('You are viewing this file locally — just save it from your browser (Cmd/Ctrl+S) or copy the file directly.');
+          return;
+        }
+        const res = await fetch(window.location.href, { credentials: 'same-origin' });
+        const text = await res.text();
+        downloadBlob(text, 'text/html;charset=utf-8', 'lottie-website-tester.html');
+      } catch (err) {
+        alert('Could not auto-download. Use your browser\'s "Save Page As…" instead.');
+      }
+    });
+  }
+
+  // Collapse toggles
+  $('#toggle-config').addEventListener('click', () => {
+    const body = $('#config-body'); const btn = $('#toggle-config');
+    if (body.style.display === 'none') { body.style.display = ''; btn.textContent = '−'; }
+    else { body.style.display = 'none'; btn.textContent = '+'; }
+  });
+  $('#toggle-help').addEventListener('click', () => {
+    const body = $('#help-body'); const btn = $('#toggle-help');
+    if (body.style.display === 'none') { body.style.display = ''; btn.textContent = '−'; }
+    else { body.style.display = 'none'; btn.textContent = '+'; }
+  });
+}
+
+/* ===================== Init ===================== */
+function init() {
+  setText('version-tag', 'v' + VERSION);
+  detectEnvironment();
+
+  const loaded = loadConfig();
+  state.config = loaded || { ...DEFAULTS };
+  state.config.userAgent = state.config.userAgent || DEFAULT_USER_AGENT;
+  if (!state.config.startUrl) {
+    state.config.startUrl = window.location.protocol === 'file:' ? '' : (window.location.origin + '/');
+  }
+  writeConfigToForm(state.config);
+
+  wireUI();
+  setStatusButtons();
+  renderAll();
+  if (state.config.startUrl) checkStartUrlOrigin(state.config.startUrl);
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+</script>
+</body>
+</html>
